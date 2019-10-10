@@ -23,6 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import json
 import datetime
 import time
 from alertModule.msgAlert import msg_alert
@@ -51,6 +52,7 @@ if __name__ == '__main__':
                 Contents = "NetworkFailure"
                 Msg = local_ip + " Lost Connection To " + remote_ip
                 params = {"ruleName": Contents, "message": Msg}
+                params = json.dumps(params)
                 print(params)
                 alert_res = msg_alert(phone_number, params)
                 print(alert_res)
