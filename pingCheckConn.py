@@ -54,17 +54,13 @@ if __name__ == '__main__':
                 print(params)
                 alert_res = msg_alert(phone_number, params)
                 print(alert_res)
-
                 ping_status = "DOWN"
-            else:
-                time.sleep(60)
         elif status is "UP":
             ping_status = "UP"
-            time.sleep(60)
         else:
             print("Please Check Local Network！")
             ping_status = "DOWN"
-            time.sleep(60)
 
         now_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print("[" + now_time + "]" + "Connection Status is " + ping_status)
+        time.sleep(60)
