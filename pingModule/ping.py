@@ -186,19 +186,19 @@ def verbose_ping(dest_addr, timeout=2, count=4):
     pingStatus = "SockertError"
 
     for i in range(count):
-        print "ping %s..." % dest_addr,
+        print("ping " + dest_addr + "...")
         try:
             delay = do_one(dest_addr, timeout)
         except socket.gaierror as e:
-            print "failed. (socket error: '%s')" % e[1]
+            print("failed. (socket error: " + e[1] + ".)" )
             break
 
         if delay is None:
-            print "failed. (timeout within %ssec.)" % timeout
+            print ("failed. (timeout within " + str(timeout) + ".)")
             return "DOWN"
         else:
             delay = delay * 1000
-            print "get ping in %0.4fms" % delay
+            print("get ping in " + str(delay))
             return "UP"
     print
     return pingStatus
