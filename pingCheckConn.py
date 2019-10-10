@@ -23,6 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+import datetime
 import time
 from alertModule.msgAlert import msg_alert
 from pingModule.ping import verbose_ping
@@ -57,14 +58,13 @@ if __name__ == '__main__':
                 ping_status = "DOWN"
             else:
                 time.sleep(60)
-                continue
         elif status is "UP":
             ping_status = "UP"
             time.sleep(60)
-            continue
         else:
             print("Please Check Local Network！")
             ping_status = "DOWN"
             time.sleep(60)
 
-        print("Now Status is " + ping_status)
+        now_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print("[" + now_time + "]" + "Connection Status is " + ping_status)
