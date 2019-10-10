@@ -51,7 +51,6 @@
     $Author: $
 """
 
-
 import os, sys, socket, struct, select, time
 
 if sys.platform == "win32":
@@ -62,7 +61,7 @@ else:
     default_timer = time.time
 
 # From /usr/include/linux/icmp.h; your milage may vary.
-ICMP_ECHO_REQUEST = 8 # Seems to be the same on Solaris.
+ICMP_ECHO_REQUEST = 8  # Seems to be the same on Solaris.
 
 
 def checksum(source_string):
@@ -71,19 +70,19 @@ def checksum(source_string):
     to suggest that it gives the same answers as in_cksum in ping.c
     """
     sum = 0
-    countTo = (len(source_string)/2)*2
+    countTo = (len(source_string) / 2) * 2
     count = 0
-    while count<countTo:
-        thisVal = ord(source_string[count + 1])*256 + ord(source_string[count])
+    while count < countTo:
+        thisVal = ord(source_string[count + 1]) * 256 + ord(source_string[count])
         sum = sum + thisVal
-        sum = sum & 0xffffffff # Necessary?
+        sum = sum & 0xffffffff  # Necessary?
         count = count + 2
 
-    if countTo<len(source_string):
+    if countTo < len(source_string):
         sum = sum + ord(source_string[len(source_string) - 1])
-        sum = sum & 0xffffffff # Necessary?
+        sum = sum & 0xffffffff  # Necessary?
 
-    sum = (sum >> 16)  +  (sum & 0xffff)
+    sum = (sum >> 16) + (sum & 0xffff)
     sum = sum + (sum >> 16)
     answer = ~sum
     answer = answer & 0xffff
@@ -103,7 +102,7 @@ def receive_one_ping(my_socket, ID, timeout):
         startedSelect = default_timer()
         whatReady = select.select([my_socket], [], [], timeLeft)
         howLongInSelect = (default_timer() - startedSelect)
-        if whatReady[0] == []: # Timeout
+        if whatReady[0] == []:  # Timeout
             return
 
         timeReceived = default_timer()
@@ -129,7 +128,7 @@ def send_one_ping(my_socket, dest_addr, ID):
     """
     Send one ping to the given >dest_addr<.
     """
-    dest_addr  =  socket.gethostbyname(dest_addr)
+    dest_addr = socket.gethostbyname(dest_addr)
 
     # Header is type (8), code (8), checksum (16), id (16), sequence (16)
     my_checksum = 0
@@ -149,7 +148,7 @@ def send_one_ping(my_socket, dest_addr, ID):
         "bbHHh", ICMP_ECHO_REQUEST, 0, socket.htons(my_checksum), ID, 1
     )
     packet = header + data
-    my_socket.sendto(packet, (dest_addr, 1)) # Don't know about the 1
+    my_socket.sendto(packet, (dest_addr, 1))  # Don't know about the 1
 
 
 def do_one(dest_addr, timeout):
@@ -159,7 +158,7 @@ def do_one(dest_addr, timeout):
     icmp = socket.getprotobyname("icmp")
     try:
         my_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
-    except socket.error, (errno, msg):
+    except socket.error as (errno, msg):
         if errno == 1:
             # Operation not permitted
             msg = msg + (
@@ -167,7 +166,7 @@ def do_one(dest_addr, timeout):
                 " running as root."
             )
             raise socket.error(msg)
-        raise # raise the original error
+        raise  # raise the original error
 
     my_ID = os.getpid() & 0xFFFF
 
@@ -178,28 +177,28 @@ def do_one(dest_addr, timeout):
     return delay
 
 
-def verbose_ping(dest_addr, timeout = 2, count = 4):
+def verbose_ping(dest_addr, timeout=2, count=4):
     """
     Send >count< ping to >dest_addr< with the given >timeout< and display
     the result.
     """
-    for i in xrange(count):
+
+    pingStatus = "SockertError"
+
+    for i in range(count):
         print "ping %s..." % dest_addr,
         try:
-            delay  =  do_one(dest_addr, timeout)
-        except socket.gaierror, e:
+            delay = do_one(dest_addr, timeout)
+        except socket.gaierror as e:
             print "failed. (socket error: '%s')" % e[1]
             break
 
-        if delay  ==  None:
+        if delay is None:
             print "failed. (timeout within %ssec.)" % timeout
+            return "DOWN"
         else:
-            delay  =  delay * 1000
+            delay = delay * 1000
             print "get ping in %0.4fms" % delay
+            return "UP"
     print
-
-
-if __name__ == '__main__':
-    verbose_ping("baidu.com")
-    verbose_ping("a-test-url-taht-is-not-available.com")
-    verbose_ping("192.168.1.1")
+    return pingStatus
